@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>JPG to PNG Converter</title>
+</head>
+<body>
+	<h1>JPG to PNG Converter</h1>
+	<label for="file">Select a JPG file:</label>
+	<input type="file" id="file">
+	<button id="convert">Convert to PNG</button>
+	<canvas id="canvas"></canvas>
+	<a id="download" download="image.png" style="display: none;">Download PNG</a>
+
+	<script>
+		const fileInput = document.getElementById('file');
+		const convertButton = document.getElementById('convert');
+		const canvas = document.getElementById('canvas');
+		const downloadLink = document.getElementById('download');
+
+		// Add event listener to the file input
+		fileInput.addEventListener('change', () => {
+			// Reset canvas and download link
+			canvas.width = 0;
+			canvas.height = 0;
+			downloadLink.href = '';
+			downloadLink.style.display = 'none';
+
+			// Check if a file was selected
+			if (fileInput.files.length > 0) {
+				const file = fileInput.files[0];
+
+				// Check if the file is a JPG
+				if (file.type === 'image/jpeg') {
+					// Create a FileReader to read the file
+					const reader = new FileReader();
+
+					reader.addEventListener('load', () => {
+						// Create an Image element to load the JPG
+						const image = new Image();
+
+						image.addEventListener('load', () => {
+							// Create a canvas to draw the PNG
+							canvas.width = image.width;
+							canvas.height = image.height;
+
+							const context = canvas.getContext('2d');
+							context.drawImage(image, 0, 0, image.width, image.height);
+
+							// Convert the canvas to a PNG and set the download link
+							const pngData = canvas.toDataURL('image/png');
+							downloadLink.href = pngData;
+							downloadLink.style.display = 'block';
+						});
+
+						// Set the Image source to the JPG data
+						image.src = reader.result;
+					});
+
+					// Read the file as a data URL
+					reader.readAsDataURL(file);
+				} else {
+					alert('Please select a JPG file');
+				}
+			}
+		});
+
+		// Add event listener to the convert button
+		convertButton.addEventListener('click', () => {
+			// Trigger the file input click event
+			fileInput.click();
+		});
+	</script>
+</body>
+</html>
